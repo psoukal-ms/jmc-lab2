@@ -1,0 +1,306 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseAccounts_jmc_mongodb_name": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "sites_jmc_app_name": {
+            "defaultValue": "jmc-app",
+            "type": "String"
+        },
+        "config_web_name": {
+            "defaultValue": "web",
+            "type": "String"
+        },
+        "serverfarms_jmc_appserviceplan_name": {
+            "defaultValue": "jmc-appserviceplan",
+            "type": "String"
+        },
+        "databaseAccounts_jmc_mongodb_name_1": {
+            "defaultValue": "jmc-mongodb",
+            "type": "String"
+        },
+        "database_name_name": {
+            "defaultValue": "simplemean",
+            "type": "String"
+        },	
+        "hostNameBindings_jmc_app.azurewebsites.net_name": {
+            "defaultValue": "jmc-app.azurewebsites.net",
+            "type": "String"
+        },
+        "deployments_name": {
+            "defaultValue": "jmc-app",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourceGroups/jmc-lab2/providers/Microsoft.DocumentDB/databaseAccounts/jmc-mongodb'.",
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "kind": "MongoDB",
+            "name": "[parameters('databaseAccounts_jmc_mongodb_name_1')]",
+            "apiVersion": "2015-04-08",
+            "location": "Southeast Asia",
+            "tags": {},
+            "scale": null,
+            "properties": {
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                    "defaultConsistencyLevel": "Session",
+                    "maxIntervalInSeconds": 5,
+                    "maxStalenessPrefix": 100
+                },
+                "name": "[parameters('databaseAccounts_jmc_mongodb_name')]"
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourceGroups/jmc-lab2/providers/Microsoft.Web/serverfarms/jmc-appserviceplan'.",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "F1",
+                "tier": "Free",
+                "size": "F1",
+                "family": "F",
+                "capacity": 0
+            },
+            "kind": "app",
+            "name": "[parameters('serverfarms_jmc_appserviceplan_name')]",
+            "apiVersion": "2016-09-01",
+            "location": "Southeast Asia",
+            "scale": null,
+            "properties": {
+                "name": "[parameters('serverfarms_jmc_appserviceplan_name')]",
+                "workerTierName": null,
+                "adminSiteName": null,
+                "hostingEnvironmentProfile": null,
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourceGroups/jmc-lab2/providers/Microsoft.Web/sites/jmc-app'.",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[parameters('sites_jmc_app_name')]",
+            "apiVersion": "2016-08-01",
+            "location": "Southeast Asia",
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('sites_jmc_app_name'),'.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "virtualIP": null,
+                        "thumbprint": null,
+                        "toUpdate": null,
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('sites_jmc_app_name'),'.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "virtualIP": null,
+                        "thumbprint": null,
+                        "toUpdate": null,
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_jmc_appserviceplan_name'))]",
+                "reserved": false,
+                "siteConfig": null,
+                "scmSiteAlsoStopped": false,
+                "hostingEnvironmentProfile": null,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "cloningInfo": null
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_jmc_appserviceplan_name'))]"
+            ]
+			,
+			"resources": [
+				{
+					"apiVersion": "2016-08-01",
+					"name": "appsettings",
+					"type": "config",
+					"dependsOn": [
+						"[concat('Microsoft.Web/sites/', parameters('sites_jmc_app_name'))]",					
+						"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_jmc_mongodb_name_1'))]"				
+					],
+
+					"properties": {
+
+						"WEBSITE_NODE_DEFAULT_VERSION": "7.0.0",
+						"MONGODB_URI": "[replace(listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_jmc_mongodb_name_1')), '2015-04-08').connectionStrings[0].connectionString, '?ssl=true', concat(parameters('database_name_name'),'?ssl=true'))]"
+					}
+				}	
+			]
+
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourceGroups/jmc-lab2/providers/Microsoft.Web/sites/jmc-app/config/web'.",
+            "type": "Microsoft.Web/sites/config",
+            "name": "[concat(parameters('sites_jmc_app_name'), '/', parameters('config_web_name'))]",
+            "apiVersion": "2016-08-01",
+            "location": "Southeast Asia",
+            "scale": null,
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "",
+                "windowsFxVersion": null,
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": null,
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$jmc-app",
+                "publishingPassword": null,
+                "appSettings": null,
+                "metadata": null,
+                "connectionStrings": null,
+                "machineKey": null,
+                "handlerMappings": null,
+                "documentRoot": null,
+                "scmType": "LocalGit",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "javaVersion": null,
+                "javaContainer": null,
+                "javaContainerVersion": null,
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": 0,
+                "winAuthTenantState": 0,
+                "customAppPoolIdentityAdminState": false,
+                "customAppPoolIdentityTenantState": false,
+                "runtimeADUser": null,
+                "runtimeADUserPassword": null,
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "limits": null,
+                "autoHealEnabled": false,
+                "autoHealRules": null,
+                "tracingOptions": null,
+                "vnetName": "",
+                "siteAuthEnabled": false,
+                "siteAuthSettings": {
+                    "enabled": null,
+                    "unauthenticatedClientAction": null,
+                    "tokenStoreEnabled": null,
+                    "allowedExternalRedirectUrls": null,
+                    "defaultProvider": null,
+                    "clientId": null,
+                    "clientSecret": null,
+                    "issuer": null,
+                    "allowedAudiences": null,
+                    "additionalLoginParams": null,
+                    "isAadAutoProvisioned": false,
+                    "googleClientId": null,
+                    "googleClientSecret": null,
+                    "googleOAuthScopes": null,
+                    "facebookAppId": null,
+                    "facebookAppSecret": null,
+                    "facebookOAuthScopes": null,
+                    "twitterConsumerKey": null,
+                    "twitterConsumerSecret": null,
+                    "microsoftAccountClientId": null,
+                    "microsoftAccountClientSecret": null,
+                    "microsoftAccountOAuthScopes": null
+                },
+                "cors": null,
+                "push": null,
+                "apiDefinition": null,
+                "autoSwapSlotName": null,
+                "localMySqlEnabled": false,
+                "managedServiceIdentityId": null,
+                "xManagedServiceIdentityId": null,
+                "ipSecurityRestrictions": null,
+                "http20Enabled": true,
+                "minTlsVersion": "1.0",
+                "ftpsState": "AllAllowed"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_jmc_app_name'))]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_jmc_mongodb_name_1'))]"				
+            ]
+        },
+
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourcegroups/jmc-lab2/providers/Microsoft.Web/sites/jmc-app/deployments/07c07dd8db4eece6ab0a6230146bdd88ef09a587'.",
+            "type": "Microsoft.Web/sites/deployments",
+            "name": "[concat(parameters('sites_jmc_app_name'), '/', parameters('deployments_name'))]",
+            "apiVersion": "2016-08-01",
+            "location": "Southeast Asia",
+            "scale": null,
+            "properties": {
+                "id": "[parameters('deployments_name')]",
+                "status": 4,
+                "author_email": "gary.buckmaster@gmail.com",
+                "author": "gbuckmaster",
+                "deployer": "jmc-deployment",
+                "message": "inital push to github\n",
+                "start_time": "2018-05-18T21:42:07.2860202Z",
+                "end_time": "2018-05-18T21:43:10.3241945Z",
+                "active": true
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_jmc_app_name'))]",
+				"[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('databaseAccounts_jmc_mongodb_name_1'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/3adcb36b-e91d-43a8-bf95-84a52c427ce6/resourceGroups/jmc-lab2/providers/Microsoft.Web/sites/jmc-app/hostNameBindings/jmc-app.azurewebsites.net'.",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "name": "[concat(parameters('sites_jmc_app_name'), '/', parameters('hostNameBindings_jmc_app.azurewebsites.net_name'))]",
+            "apiVersion": "2016-08-01",
+            "location": "Southeast Asia",
+            "scale": null,
+            "properties": {
+                "siteName": "jmc-app",
+                "domainId": null,
+                "hostNameType": "Verified"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_jmc_app_name'))]"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "databaseAccounts_jmc_mongodb_name": {
+            "value": null
+        },
+        "sites_jmc_app_name": {
+            "value": null
+        },
+        "config_web_name": {
+            "value": null
+        },
+        "serverfarms_jmc_appserviceplan_name": {
+            "value": null
+        },
+        "databaseAccounts_jmc_mongodb_name_1": {
+            "value": null
+        },
+        "hostNameBindings_jmc_app.azurewebsites.net_name": {
+            "value": null
+        },
+        "deployments_name": {
+            "value": null
+        }
+        "database_name_name": {
+            "value": 'simplemean'
+        }		
+    }
+}
