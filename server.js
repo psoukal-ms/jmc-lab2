@@ -6,6 +6,8 @@ var express = require('express'),
     assert = require('assert'),
     ObjectId = require('mongodb').ObjectID,
     url = 'mongodb://localhost:27017/simplemean';
+var appInsights = require('applicationinsights');
+    appInsights.setup().start()
 
 app.use(express.static(__dirname + "/public"));
 
