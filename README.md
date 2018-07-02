@@ -33,3 +33,8 @@ app.put('/records/:id', function(req, res, next){
 ```
 
 This is for simple seed mean app at it basic level for learning.
+
+# Azure ARM template
+
+ARM template used to deploy (development/test) App Service web app with CosmosDB configured as MongoDb. 
+See ./AzureTemplate
